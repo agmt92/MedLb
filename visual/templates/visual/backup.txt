@@ -1,0 +1,17 @@
+{% extends "base_menu.html" %}
+{% load static %}
+
+{% block content %}
+<div id="visualization"></div>
+
+<!-- Include D3.js from a CDN or your static files -->
+<script src="https://d3js.org/d3.v6.min.js"></script>
+
+<!-- Include your data visualization script -->
+<script src="{% static 'home/js/data2.js' %}"></script>
+
+<script>
+    // If needed, additional JavaScript for initialization can go here
+</script>
+
+{% endblock %}

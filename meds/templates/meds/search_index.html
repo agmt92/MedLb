@@ -1,0 +1,147 @@
+{% extends "base_menu.html" %}
+{% block content %}
+
+<div class="container mt-3">
+
+<h1>Drug Search</h1>
+<div class="row">
+    <div class="col-md-12">
+        <form method="get" action=".">
+            <div class="input-group mb-3">
+                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search for drugs...">
+                <button class="btn btn-outline-secondary" type="submit" id="button-search">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+{% if drugs %}
+
+        {% for drug in page_obj %}
+        <p>
+            <div class="card">
+                <div class="card-body d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">{{ drug.name.namnam }} {{ drug.dosage.dosnam }}</h5>
+                            <h6 class="card-subtitle">
+                                <script>document.write(new Intl.NumberFormat().format({{ drug.price17424 }}));</script> L.L.
+                                <p class="card-text">{{ drug.presentation.presnam }} {{ drug.form.formnam }}</p>
+
+                            </h6>
+                             <p class="card-text">Active Ingredient: {{ drug.ingredient.ingnam }}</p>
+                             <p class="card-text">{{ drug.manufacturer.mannam }}, {{ drug.country.counam }}.</p>
+
+                             <!-- Buttons for all users -->
+                                <a href="{% url 'meds:drug-detail' drug.id %}" class="btn btn-secondary btn-sm">Drug Page</a>
+
+                                {% if drug.ingredient %}
+                                <a href="{% url 'meds:ing-detail' drug.ingredient.id %}" class="btn btn-info btn-sm">Identical Drugs</a>
+                                {% endif %}
+
+                                {% if drug.atc %}
+                                <a href="{% url 'meds:atc-detail' drug.atc.id %}" class="btn btn-primary btn-sm">Similar Drugs</a>
+                                {% endif %}
+
+                    </div>
+
+            {% if user.is_authenticated %}
+            <!-- Two hrefs with two stacked icons each - one showing and one hidden -->
+            <a href="#" onclick=
+                "favPost('{% url 'meds:med_unfavorite' drug.id %}', {{ drug.id }} );return false;"
+                {% if drug.id not in favorites %} style="display: none;" {% endif %}
+                id="favorite_star_{{drug.id}}">
+                <span class="fa-stack" style="vertical-align: middle;">
+                    <i class="fa fa-star fa-stack-1x" style="color: orange;"></i>
+                    <i class="fa fa-star-o fa-stack-1x"></i>
+                </span>
+            </a>
+            <!-- the second href -->
+            <a href="#" onclick=
+                "favPost('{% url 'meds:med_favorite' drug.id %}', {{ drug.id }} );return false;"
+                {% if drug.id in favorites %} style="display: none;" {% endif %}
+                id="unfavorite_star_{{drug.id}}">
+                <span class="fa-stack" style="vertical-align: middle;">
+                    <i class="fa fa-star fa-stack-1x" style="display: none; color: orange;"></i>
+                    <i class="fa fa-star-o fa-stack-1x"></i>
+                </span>
+            </a>
+            {% endif %}
+
+                </div>
+            </div>
+        </p>
+        {% endfor %}
+
+<nav>
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}" aria-label="First">First</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}" aria-label="Previous">Previous</a>
+      </li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}" aria-label="Next">Next</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}" aria-label="Last">Last</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+
+{% else %}
+    <p><a>No results found.</a></p>
+{% endif %}
+
+    <p><a class="nav-link" href="{% url 'ads:ad_create' %}">Leave us a comment</a></p>
+
+<script>
+function toggleInlineDisplay(star_id) {
+    var elem = document.getElementById(star_id);
+    if(window.getComputedStyle(elem).display == "inline") {
+        elem.style.display = 'none';
+        elem.dataset.previousDisplay = 'inline';
+    } else if(window.getComputedStyle(elem).display == "block") {
+        elem.style.display = 'none';
+        elem.dataset.previousDisplay = 'block';
+    } else {
+        console.log('prev', elem.dataset.previousDisplay);
+        if ( typeof elem.dataset.previousDisplay == 'string' ) {
+            elem.style.display = elem.dataset.previousDisplay
+        } else {
+            elem.style.display = 'inline';
+        }
+    }
+}
+
+function favPost(url, drug_id) {
+    console.log('POSTing to', url);
+    fetch(url, { method: 'POST', body: '{}' } )
+    .then((response) => {
+        console.log(url, 'finished');
+        toggleInlineDisplay("unfavorite_star_"+drug_id);
+        toggleInlineDisplay("favorite_star_"+drug_id);
+    }).catch((error) => {
+        alert('Url failed with '+error+' '+url);
+    });
+}
+</script>
+
+{% endblock %}

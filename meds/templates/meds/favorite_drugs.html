@@ -1,0 +1,64 @@
+<!-- meds/templates/meds/favorite_drugs.html -->
+{% extends "base_menu.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<h2>Your Bookmarked Medications</h2>
+{% if favorite_drugs %}
+    {% for drug in favorite_drugs %}
+    <p>
+<div class="card">
+    <div class="card-body d-flex justify-content-between">
+        <div>
+            <h5 class="card-title">{{ drug.name.namnam }} {{ drug.dosage.dosnam }} {{ drug.form.formnam }}</h5>
+            <h6 class="card-subtitle mb-2 ">
+                <script>document.write(new Intl.NumberFormat().format({{ drug.price17424 }}));</script> L.L.
+                <p class="card-text">{{ drug.presentation.presnam }} {{ drug.form.formnam }}</p>
+
+            </h6>
+            <p class="card-text">Active Ingredient: {{ drug.ingredient.ingnam }}</p>
+            <!-- Buttons for all users -->
+            <a href="{% url 'meds:drug-detail' drug.id %}" class="btn btn-secondary btn-sm">Drug Page</a>
+                                {% if drug.ingredient %}
+                                <a href="{% url 'meds:ing-detail' drug.ingredient.id %}" class="btn btn-info btn-sm">Identical Drugs</a>
+                                {% endif %}
+
+                                {% if drug.atc %}
+                                <a href="{% url 'meds:atc-detail' drug.atc.id %}" class="btn btn-primary btn-sm">Similar Drugs</a>
+                                {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+            <!-- "Remove from Favorites" Button for authenticated users -->
+            <div>
+                <button onclick="favPost('{% url 'meds:med_unfavorite' drug.id %}', {{ drug.id }});return false;"
+                        class="btn btn-outline-danger btn-sm">Remove</button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+    </p>
+    {% endfor %}
+    <p><a class="nav-link" href="{% url 'ads:ad_create' %}">Leave us a comment</a></p>
+{% else %}
+    <p>No bookmarked medications found. Why not <a href="{% url 'meds:search-index' %}">add some</a> by clicking on the right-side of the card?</p>
+{% endif %}
+
+<script>
+function favPost(url, drug_id) {
+    console.log('POSTing to', url);
+    fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' })
+    .then((response) => {
+        if (!response.ok) throw new Error('Network response was not ok.');
+        console.log(url, 'finished');
+        // Optionally remove the drug card from view or refresh the page to update the list
+        document.location.reload(true);
+    })
+    .catch((error) => {
+        console.error('Fetch error: ', error);
+        alert('Operation failed: ' + error);
+    });
+}
+</script>
+{% endblock %}

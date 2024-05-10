@@ -1,0 +1,398 @@
+chart = {
+  // Specify the dimensions of the chart.
+  const width = 928;
+  const height = 680;
+
+  // Specify the color scale.
+  const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+  // The force simulation mutates links and nodes, so create a copy
+  // so that re-evaluating this cell produces the same result.
+  const links = data.links.map(d => ({...d}));
+  const nodes = data.nodes.map(d => ({...d}));
+
+  // Create a simulation with several forces.
+  const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id))
+      .force("charge", d3.forceManyBody())
+      .force("x", d3.forceX())
+      .force("y", d3.forceY());
+
+  // Create the SVG container.
+  const svg = d3.create("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", [-width / 2, -height / 2, width, height])
+      .attr("style", "max-width: 100%; height: auto;");
+
+  // Add a line for each link, and a circle for each node.
+  const link = svg.append("g")
+      .attr("stroke", "#999")
+      .attr("stroke-opacity", 0.6)
+    .selectAll("line")
+    .data(links)
+    .join("line")
+      .attr("stroke-width", d => Math.sqrt(d.value));
+
+  const node = svg.append("g")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 1.5)
+    .selectAll("circle")
+    .data(nodes)
+    .join("circle")
+      .attr("r", 5)
+      .attr("fill", d => color(d.group));
+
+  node.append("title")
+      .text(d => d.id);
+
+  // Add a drag behavior.
+  node.call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+  // Set the position attributes of links and nodes each time the simulation ticks.
+  simulation.on("tick", () => {
+    link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+    node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+  });
+
+  // Reheat the simulation when drag starts, and fix the subject position.
+  function dragstarted(event) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    event.subject.fx = event.subject.x;
+    event.subject.fy = event.subject.y;
+  }
+
+  // Update the subject (dragged node) position during drag.
+  function dragged(event) {
+    event.subject.fx = event.x;
+    event.subject.fy = event.y;
+  }
+
+  // Restore the target alpha so the simulation cools after dragging ends.
+  // Unfix the subject position now that it’s no longer being dragged.
+  function dragended(event) {
+    if (!event.active) simulation.alphaTarget(0);
+    event.subject.fx = null;
+    event.subject.fy = null;
+  }
+
+  // When this cell is re-run, stop the previous simulation. (This doesn’t
+  // really matter since the target alpha is zero and the simulation will
+  // stop naturally, but it’s a good practice.)
+  invalidation.then(() => simulation.stop());
+
+  return svg.node();
+}
+
+data = Object {
+  nodes: Array(336) [
+  0: Object {id: "Structural basis of PROTAC cooperative recognition for selective protein degradation.", group: "Cited Works", radius: 2, citing_patents_count: 2}
+  1: Object {id: "The influence of rough lipopolysaccharide structur…nteractions with mammalian antimicrobial peptides", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  2: Object {id: "New Synthetic Routes to Triazolo-benzodiazepine An… and Extra-Terminal (BET) Bromodomain Inhibition.", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  3: Object {id: "Cyclic and Macrocyclic Peptides as Chemical Tools … Surfaces and Probe Protein-Protein Interactions.", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  4: Object {id: "8-Substituted Pyrido[3,4-d]pyrimidin-4(3H)-one Der…5 (JARID1) Histone Lysine Demethylase Inhibitors.", group: "Cited Works", radius: 3, citing_patents_count: 3}
+  5: Object {id: "Discovery of Type II Inhibitors of TGFβ-Activated …ed Protein Kinase Kinase Kinase Kinase 2 (MAP4K2)", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  6: Object {id: "SIK2 regulates CRTCs, HDAC4 and glucose uptake in adipocytes", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  7: Object {id: "Metabotropic Glutamate Receptor 5 Negative Alloste…Promising Novel Medicine for Psychiatric Diseases", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  8: Object {id: "Nrf2 regulates ROS production by mitochondria and NADPH oxidase.", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  9: Object {id: "The clinically approved drugs dasatinib and bosuti…rophages by inhibiting the salt-inducible kinases", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  10: Object {id: "New Monocyclic, Bicyclic, and Tricyclic Ethynylcya…and Inhibitors of Inducible Nitric Oxide Synthase", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  11: Object {id: "Palmitoylation of the Na/Ca exchanger cytoplasmic …ation and internalization during stress signaling", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  12: Object {id: "Molecular Cloning and Functional Characterization …is Serogroup A TOWARD IN VITRO VACCINE PRODUCTION", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  13: Object {id: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", group: "Cited Works", radius: 7, citing_patents_count: 7}
+  14: Object {id: "An unexpected twist to the activation of IKKβ: TAK…primes IKKβ for activation by autophosphorylation", group: "Cited Works", radius: 2, citing_patents_count: 2}
+  15: Object {id: "Crystallographic analysis of Neisseria meningitidi… loops potentially implicated in TLR2 recognition", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  16: Object {id: "The LKB1-salt-inducible kinase pathway functions as a key gluconeogenic suppressor in the liver", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  17: Object {id: "Characterization of VPS34-IN1, a selective inhibit…eam target of class III phosphoinositide 3-kinase", group: "Cited Works", radius: 3, citing_patents_count: 3}
+  18: Object {id: "3-(2-oxoethylidene)indolin-2-one derivatives activ… NF-κB: potential candidates for chemoprevention.", group: "Cited Works", radius: 6, citing_patents_count: 6}
+  19: Object {id: "Carnosic acid stimulates glucose uptake in skeleta…muscle cells via a PME-1/PP2A/PKB signalling axis", group: "Cited Works", radius: 1, citing_patents_count: 1}
+  … more
+]
+  links: Array(275) [
+  0: Object {source: "Structural basis of PROTAC cooperative recognition for selective protein degradation.", target: "109-294-662-661-65X", value: 2}
+  1: Object {source: "Structural basis of PROTAC cooperative recognition for selective protein degradation.", target: "074-937-457-594-345", value: 2}
+  2: Object {source: "The influence of rough lipopolysaccharide structur…nteractions with mammalian antimicrobial peptides", target: "081-355-367-506-27X", value: 2}
+  3: Object {source: "New Synthetic Routes to Triazolo-benzodiazepine An… and Extra-Terminal (BET) Bromodomain Inhibition.", target: "048-634-530-447-798", value: 2}
+  4: Object {source: "Cyclic and Macrocyclic Peptides as Chemical Tools … Surfaces and Probe Protein-Protein Interactions.", target: "137-231-469-269-151", value: 2}
+  5: Object {source: "8-Substituted Pyrido[3,4-d]pyrimidin-4(3H)-one Der…5 (JARID1) Histone Lysine Demethylase Inhibitors.", target: "031-072-815-607-16X", value: 2}
+  6: Object {source: "8-Substituted Pyrido[3,4-d]pyrimidin-4(3H)-one Der…5 (JARID1) Histone Lysine Demethylase Inhibitors.", target: "105-312-070-982-098", value: 2}
+  7: Object {source: "8-Substituted Pyrido[3,4-d]pyrimidin-4(3H)-one Der…5 (JARID1) Histone Lysine Demethylase Inhibitors.", target: "018-515-082-074-296", value: 2}
+  8: Object {source: "Discovery of Type II Inhibitors of TGFβ-Activated …ed Protein Kinase Kinase Kinase Kinase 2 (MAP4K2)", target: "027-228-373-793-594", value: 2}
+  9: Object {source: "SIK2 regulates CRTCs, HDAC4 and glucose uptake in adipocytes", target: "016-712-604-622-721", value: 2}
+  10: Object {source: "Metabotropic Glutamate Receptor 5 Negative Alloste…Promising Novel Medicine for Psychiatric Diseases", target: "086-316-087-480-933", value: 2}
+  11: Object {source: "Nrf2 regulates ROS production by mitochondria and NADPH oxidase.", target: "118-309-833-112-117", value: 2}
+  12: Object {source: "The clinically approved drugs dasatinib and bosuti…rophages by inhibiting the salt-inducible kinases", target: "134-672-819-080-83X", value: 2}
+  13: Object {source: "New Monocyclic, Bicyclic, and Tricyclic Ethynylcya…and Inhibitors of Inducible Nitric Oxide Synthase", target: "036-789-224-520-054", value: 2}
+  14: Object {source: "Palmitoylation of the Na/Ca exchanger cytoplasmic …ation and internalization during stress signaling", target: "106-594-488-484-12X", value: 2}
+  15: Object {source: "Molecular Cloning and Functional Characterization …is Serogroup A TOWARD IN VITRO VACCINE PRODUCTION", target: "125-726-727-125-409", value: 2}
+  16: Object {source: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", target: "161-487-188-181-03X", value: 2}
+  17: Object {source: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", target: "076-538-237-089-675", value: 2}
+  18: Object {source: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", target: "051-324-518-696-462", value: 2}
+  19: Object {source: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", target: "198-017-973-913-570", value: 2}
+  20: Object {source: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", target: "156-653-831-632-101", value: 2}
+  21: Object {source: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", target: "178-739-712-688-618", value: 2}
+  22: Object {source: "A bump-and-hole approach to engineer controlled selectivity of BET bromodomain chemical probes", target: "048-634-530-447-798", value: 2}
+  23: Object {source: "An unexpected twist to the activation of IKKβ: TAK…primes IKKβ for activation by autophosphorylation", target: "131-486-498-702-07X", value: 2}
+  24: Object {source: "An unexpected twist to the activation of IKKβ: TAK…primes IKKβ for activation by autophosphorylation", target: "010-031-167-075-106", value: 2}
+  25: Object {source: "Crystallographic analysis of Neisseria meningitidi… loops potentially implicated in TLR2 recognition", target: "119-453-428-180-987", value: 2}
+  26: Object {source: "The LKB1-salt-inducible kinase pathway functions as a key gluconeogenic suppressor in the liver", target: "016-712-604-622-721", value: 2}
+  27: Object {source: "Characterization of VPS34-IN1, a selective inhibit…eam target of class III phosphoinositide 3-kinase", target: "153-595-914-216-97X", value: 2}
+  28: Object {source: "Characterization of VPS34-IN1, a selective inhibit…eam target of class III phosphoinositide 3-kinase", target: "148-353-591-913-750", value: 2}
+  29: Object {source: "Characterization of VPS34-IN1, a selective inhibit…eam target of class III phosphoinositide 3-kinase", target: "019-827-938-996-490", value: 2}
+  30: Object {source: "3-(2-oxoethylidene)indolin-2-one derivatives activ… NF-κB: potential candidates for chemoprevention.", target: "184-646-935-269-773", value: 2}
+  31: Object {source: "3-(2-oxoethylidene)indolin-2-one derivatives activ… NF-κB: potential candidates for chemoprevention.", target: "186-230-275-872-748", value: 2}
+  32: Object {source: "3-(2-oxoethylidene)indolin-2-one derivatives activ… NF-κB: potential candidates for chemoprevention.", target: "165-291-395-706-725", value: 2}
+  33: Object {source: "3-(2-oxoethylidene)indolin-2-one derivatives activ… NF-κB: potential candidates for chemoprevention.", target: "047-113-007-956-15X", value: 2}
+  34: Object {source: "3-(2-oxoethylidene)indolin-2-one derivatives activ… NF-κB: potential candidates for chemoprevention.", target: "089-019-916-582-397", value: 2}
+  35: Object {source: "3-(2-oxoethylidene)indolin-2-one derivatives activ… NF-κB: potential candidates for chemoprevention.", target: "136-000-598-663-919", value: 2}
+  36: Object {source: "Carnosic acid stimulates glucose uptake in skeleta…muscle cells via a PME-1/PP2A/PKB signalling axis", target: "051-072-189-723-758", value: 2}
+  37: Object {source: "Kv1.3 inhibitors have differential effects on gluc…scle cell lines and mouse ex vivo skeletal muscle", target: "040-766-915-457-886", value: 2}
+  38: Object {source: "Kv1.3 inhibitors have differential effects on gluc…scle cell lines and mouse ex vivo skeletal muscle", target: "141-482-415-400-338", value: 2}
+  39: Object {source: "Restoration of CFTR function in patients with cystic fibrosis carrying the F508del-CFTR mutation", target: "149-129-599-518-595", value: 2}
+  40: Object {source: "Restoration of CFTR function in patients with cystic fibrosis carrying the F508del-CFTR mutation", target: "156-286-485-464-499", value: 2}
+  41: Object {source: "Parkin is activated by PINK1-dependent phosphorylation of ubiquitin at Ser65", target: "001-353-214-346-040", value: 2}
+  42: Object {source: "Parkin is activated by PINK1-dependent phosphorylation of ubiquitin at Ser65", target: "118-479-143-842-720", value: 2}
+  43: Object {source: "Parkin is activated by PINK1-dependent phosphorylation of ubiquitin at Ser65", target: "007-641-959-106-118", value: 2}
+  44: Object {source: "Parkin is activated by PINK1-dependent phosphorylation of ubiquitin at Ser65", target: "189-040-066-278-226", value: 2}
+  45: Object {source: "Substrate recognition by the cell surface palmitoyl transferase DHHC5.", target: "106-594-488-484-12X", value: 2}
+  46: Object {source: "Dysregulation of ubiquitin homeostasis and β-catenin signaling promote spinal muscular atrophy", target: "026-244-336-682-442", value: 2}
+  47: Object {source: "Structure-Guided Design and Optimization of Small … Alpha Subunit with in Vitro Nanomolar Affinities", target: "074-937-457-594-345", value: 2}
+  48: Object {source: "Structure-Guided Design and Optimization of Small … Alpha Subunit with in Vitro Nanomolar Affinities", target: "168-286-254-597-740", value: 2}
+  49: Object {source: "The Nrf2 regulatory network provides an interface between redox and intermediary metabolism", target: "109-916-358-959-05X", value: 2}
+  50: Object {source: "Characterization of WZ4003 and HTH-01-015 as selec…the LKB1-tumour-suppressor-activated NUAK kinases", target: "002-458-268-309-533", value: 2}
+  51: Object {source: "Synthesis of vitamin D3 analogues with A-ring modi…ly measure vitamin D levels in biological samples", target: "038-310-729-099-192", value: 2}
+  52: Object {source: "Synthesis of vitamin D3 analogues with A-ring modi…ly measure vitamin D levels in biological samples", target: "179-033-965-606-598", value: 2}
+  53: Object {source: "Synthesis of vitamin D3 analogues with A-ring modi…ly measure vitamin D levels in biological samples", target: "113-229-447-433-64X", value: 2}
+  54: Object {source: "Synthesis of vitamin D3 analogues with A-ring modi…ly measure vitamin D levels in biological samples", target: "077-771-399-719-227", value: 2}
+  55: Object {source: "Synthesis of vitamin D3 analogues with A-ring modi…ly measure vitamin D levels in biological samples", target: "183-966-651-664-305", value: 2}
+  56: Object {source: "Synthesis of vitamin D3 analogues with A-ring modi…ly measure vitamin D levels in biological samples", target: "013-467-292-050-692", value: 2}
+  57: Object {source: "Structure-activity relationship studies of pyrrolone antimalarial agents", target: "079-314-054-163-947", value: 2}
+  58: Object {source: "Structure-activity relationship studies of pyrrolone antimalarial agents", target: "110-082-309-221-187", value: 2}
+  59: Object {source: "The Concise Guide to Pharmacology 2013/14.: The Co…Pharmacology 2013/14: G Protein-Coupled Receptors", target: "128-382-566-327-896", value: 2}
+  60: Object {source: "The Concise Guide to Pharmacology 2013/14.: The Co…Pharmacology 2013/14: G Protein-Coupled Receptors", target: "143-543-676-408-839", value: 2}
+  61: Object {source: "Elevated SGK1 predicts resistance of breast cancer cells to Akt inhibitors", target: "005-743-260-244-802", value: 2}
+  62: Object {source: "Metabolism of inflammation limited by AMPK and pseudo-starvation", target: "026-638-223-054-804", value: 2}
+  63: Object {source: "Nrf2 impacts cellular bioenergetics by controlling…strate availability for mitochondrial respiration", target: "048-208-660-423-215", value: 2}
+  64: Object {source: "The anti-inflammatory compound BAY 11-7082 is a potent inhibitor of Protein Tyrosine Phosphatases", target: "159-658-602-048-982", value: 2}
+  65: Object {source: "BslA is a self-assembling bacterial hydrophobin that coats the Bacillus subtilis biofilm", target: "077-811-145-153-079", value: 2}
+  66: Object {source: "BslA is a self-assembling bacterial hydrophobin that coats the Bacillus subtilis biofilm", target: "170-781-236-728-970", value: 2}
+  67: Object {source: "BslA is a self-assembling bacterial hydrophobin that coats the Bacillus subtilis biofilm", target: "144-284-594-583-951", value: 2}
+  68: Object {source: "Investigation of acyclic uridine amide and 5′-amid…l inhibitors of the Plasmodium falciparum dUTPase", target: "139-409-891-293-77X", value: 2}
+  69: Object {source: "Discovery and structure-activity relationships of pyrrolone antimalarials", target: "110-082-309-221-187", value: 2}
+  70: Object {source: "De Novo Design of Protein Kinase Inhibitors by in … Identification of Hinge Region-Binding Fragments", target: "081-017-751-048-013", value: 2}
+  71: Object {source: "De Novo Design of Protein Kinase Inhibitors by in … Identification of Hinge Region-Binding Fragments", target: "114-963-910-586-828", value: 2}
+  72: Object {source: "De Novo Design of Protein Kinase Inhibitors by in … Identification of Hinge Region-Binding Fragments", target: "162-513-842-046-362", value: 2}
+  73: Object {source: "Comprehensive characterization and optimization of…ucine-rich repeat kinase 2) monoclonal antibodies", target: "188-803-921-043-695", value: 2}
+  74: Object {source: "From On-Target to Off-Target Activity: Identificat…-Trypanosoma brucei Drug Discovery Lead Molecules", target: "191-147-881-232-285", value: 2}
+  75: Object {source: "From On-Target to Off-Target Activity: Identificat…-Trypanosoma brucei Drug Discovery Lead Molecules", target: "081-817-015-173-962", value: 2}
+  76: Object {source: "HIF-independent role of prolyl hydroxylases in the cellular response to amino acids", target: "106-530-060-683-82X", value: 2}
+  77: Object {source: "HIF-independent role of prolyl hydroxylases in the cellular response to amino acids", target: "133-935-409-400-672", value: 2}
+  78: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "046-588-899-387-353", value: 2}
+  79: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "051-324-518-696-462", value: 2}
+  80: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "161-487-188-181-03X", value: 2}
+  81: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "156-653-831-632-101", value: 2}
+  82: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "198-017-973-913-570", value: 2}
+  83: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "076-538-237-089-675", value: 2}
+  84: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "198-017-973-913-570", value: 2}
+  85: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "076-538-237-089-675", value: 2}
+  86: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "051-324-518-696-462", value: 2}
+  87: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "161-487-188-181-03X", value: 2}
+  88: Object {source: "Structural determinants for ERK5 (MAPK7) and leuci… of benzo[e]pyrimido-[5,4-b]diazepine-6(11H)-ones", target: "156-653-831-632-101", value: 2}
+  89: Object {source: "A novel shogaol analog suppresses cancer cell inva…lation of NF-κB and Nrf2-Keap1 signaling pathways", target: "049-222-171-973-678", value: 2}
+  90: Object {source: "A novel shogaol analog suppresses cancer cell inva…lation of NF-κB and Nrf2-Keap1 signaling pathways", target: "074-598-665-914-143", value: 2}
+  91: Object {source: "X-ray Crystal Structure of ERK5 (MAPK7) in Complex with a Specific Inhibitor", target: "161-487-188-181-03X", value: 2}
+  92: Object {source: "X-ray Crystal Structure of ERK5 (MAPK7) in Complex with a Specific Inhibitor", target: "156-653-831-632-101", value: 2}
+  93: Object {source: "X-ray Crystal Structure of ERK5 (MAPK7) in Complex with a Specific Inhibitor", target: "051-324-518-696-462", value: 2}
+  94: Object {source: "The endosome-lysosome pathway and information generation in the immune system.", target: "190-195-697-065-907", value: 2}
+  95: Object {source: "The endosome-lysosome pathway and information generation in the immune system.", target: "031-461-589-086-771", value: 2}
+  96: Object {source: "GSK2578215A; a potent and highly selective 2-arylm…stitutent-N-arylbenzamide LRRK2 kinase inhibitor.", target: "167-851-091-520-257", value: 2}
+  97: Object {source: "Structure of the TatC core of the twin-arginine protein transport system", target: "151-760-923-304-502", value: 2}
+  98: Object {source: "The Ancient Drug Salicylate Directly Activates AMP-Activated Protein Kinase", target: "097-019-537-894-104", value: 2}
+  99: Object {source: "The Ancient Drug Salicylate Directly Activates AMP-Activated Protein Kinase", target: "170-696-774-214-700", value: 2}
+  100: Object {source: "Application of a novel highly sensitive activity-based probe for detection of cathepsin G", target: "084-807-525-209-072", value: 2}
+  101: Object {source: "Analysis of the role of Nrf2 in the expression of …n mice using two-dimensional gel-based proteomics", target: "044-648-704-787-12X", value: 2}
+  102: Object {source: "PINK1 is activated by mitochondrial membrane poten…n E3 ligase activity by phosphorylating Serine 65", target: "001-353-214-346-040", value: 2}
+  103: Object {source: "PINK1 is activated by mitochondrial membrane poten…n E3 ligase activity by phosphorylating Serine 65", target: "150-822-190-827-131", value: 2}
+  104: Object {source: "PINK1 is activated by mitochondrial membrane poten…n E3 ligase activity by phosphorylating Serine 65", target: "051-919-508-851-10X", value: 2}
+  105: Object {source: "Synthesis, Chemical Reactivity as Michael Acceptor…nt Anti-inflammatory and Cytoprotective Agents(1)", target: "036-789-224-520-054", value: 2}
+  106: Object {source: "Synthesis, Chemical Reactivity as Michael Acceptor…nt Anti-inflammatory and Cytoprotective Agents(1)", target: "036-251-116-198-69X", value: 2}
+  107: Object {source: "Design, Synthesis and Biological Evaluation of Try…nosoma brucei Trypanothione Synthetase Inhibitors", target: "149-946-446-737-586", value: 2}
+  108: Object {source: "Design, Synthesis and Biological Evaluation of Try…nosoma brucei Trypanothione Synthetase Inhibitors", target: "075-397-286-033-085", value: 2}
+  109: Object {source: "Design, Synthesis and Biological Evaluation of Try…nosoma brucei Trypanothione Synthetase Inhibitors", target: "028-992-308-265-357", value: 2}
+  110: Object {source: "Design, Synthesis and Biological Evaluation of Try…nosoma brucei Trypanothione Synthetase Inhibitors", target: "044-207-676-689-405", value: 2}
+  111: Object {source: "Design, Synthesis and Biological Evaluation of Try…nosoma brucei Trypanothione Synthetase Inhibitors", target: "030-350-713-791-200", value: 2}
+  112: Object {source: "Mitogen-activated protein kinase-activated protein…ibrary and structure-based optimization approach.", target: "093-997-239-092-949", value: 2}
+  113: Object {source: "Mitogen-activated protein kinase-activated protein…ibrary and structure-based optimization approach.", target: "046-345-437-716-689", value: 2}
+  114: Object {source: "Mitogen-activated protein kinase-activated protein…ibrary and structure-based optimization approach.", target: "146-411-731-640-871", value: 2}
+  115: Object {source: "Chemical Proteomic Analysis Reveals the Drugability of the Kinome of Trypanosoma brucei", target: "000-266-572-036-366", value: 2}
+  116: Object {source: "Avirulence Protein 3a (AVR3a) from the Potato Path…gion and Does Not Specifically Bind Phospholipids", target: "186-389-876-954-313", value: 2}
+  117: Object {source: "NEDD8 overexpression results in neddylation of ubiquitin substrates by the ubiquitin pathway.", target: "168-483-508-794-377", value: 2}
+  118: Object {source: "Kinome-wide Selectivity Profiling of ATP-competiti…rs and Characterization of Their Binding Kinetics", target: "029-748-240-628-036", value: 2}
+  119: Object {source: "The ubiquitin E1 enzyme Ube1 mediates NEDD8 activation under diverse stress conditions", target: "184-507-509-452-559", value: 2}
+  120: Object {source: "Acinetobacter baumannii FolD ligand complexes – po… and a re‐evaluation of the structure of LY374571", target: "069-961-069-943-549", value: 2}
+  121: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "017-777-392-752-199", value: 2}
+  122: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "000-150-893-948-804", value: 2}
+  123: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "027-437-502-794-894", value: 2}
+  124: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "074-789-039-135-70X", value: 2}
+  125: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "063-617-165-524-327", value: 2}
+  126: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "019-872-586-012-269", value: 2}
+  127: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "103-648-347-913-447", value: 2}
+  128: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "007-245-406-573-328", value: 2}
+  129: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "027-437-502-794-894", value: 2}
+  130: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "008-337-248-044-723", value: 2}
+  131: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "197-071-041-313-103", value: 2}
+  132: Object {source: "Aurora kinase inhibitors: Progress towards the clinic", target: "098-538-513-984-747", value: 2}
+  133: Object {source: "The AMPK-related kinase SIK2 is regulated by cAMP via phosphorylation at Ser(358) in adipocytes", target: "019-125-805-246-964", value: 2}
+  134: Object {source: "The AMPK-related kinase SIK2 is regulated by cAMP via phosphorylation at Ser(358) in adipocytes", target: "172-064-016-145-117", value: 2}
+  135: Object {source: "The AMPK-related kinase SIK2 is regulated by cAMP via phosphorylation at Ser(358) in adipocytes", target: "007-417-942-335-284", value: 2}
+  136: Object {source: "Synergy of Peptide and Sugar in O-GlcNAcase Substrate Recognition", target: "005-947-025-410-764", value: 2}
+  137: Object {source: "Synergy of Peptide and Sugar in O-GlcNAcase Substrate Recognition", target: "116-404-026-640-450", value: 2}
+  138: Object {source: "Discovery of potent and selective covalent inhibitors of JNK", target: "090-437-295-781-023", value: 2}
+  139: Object {source: "Discovery of potent and selective covalent inhibitors of JNK", target: "197-158-559-918-854", value: 2}
+  140: Object {source: "Discovery of potent and selective covalent inhibitors of JNK", target: "076-225-263-850-117", value: 2}
+  141: Object {source: "Discovery of potent and selective covalent inhibitors of JNK", target: "049-199-509-181-561", value: 2}
+  142: Object {source: "Discovery of potent and selective covalent inhibitors of JNK", target: "179-045-041-176-506", value: 2}
+  143: Object {source: "Discovery of potent and selective covalent inhibitors of JNK", target: "004-301-778-674-378", value: 2}
+  144: Object {source: "Phosphorylation of FOXO3a on Ser-7 by p38 Promotes…s Nuclear Localization in Response to Doxorubicin", target: "111-313-231-732-367", value: 2}
+  145: Object {source: "AMPK: a nutrient and energy sensor that maintains energy homeostasis", target: "092-197-031-561-353", value: 2}
+  146: Object {source: "AMPK: a nutrient and energy sensor that maintains energy homeostasis", target: "192-019-786-423-841", value: 2}
+  147: Object {source: "AMPK: a nutrient and energy sensor that maintains energy homeostasis", target: "192-019-786-423-841", value: 2}
+  148: Object {source: "AMPK: a nutrient and energy sensor that maintains energy homeostasis", target: "076-608-180-638-59X", value: 2}
+  149: Object {source: "AMPK: a nutrient and energy sensor that maintains energy homeostasis", target: "175-263-797-963-040", value: 2}
+  150: Object {source: "AMPK: a nutrient and energy sensor that maintains energy homeostasis", target: "092-197-031-561-353", value: 2}
+  151: Object {source: "Synthesis and structure-activity relationships of …idines as potent inhibitors of TBK1/IKKε kinases.", target: "141-694-167-791-759", value: 2}
+  152: Object {source: "Synthesis and structure-activity relationships of …idines as potent inhibitors of TBK1/IKKε kinases.", target: "081-203-444-563-604", value: 2}
+  153: Object {source: "Synthesis and structure-activity relationships of …idines as potent inhibitors of TBK1/IKKε kinases.", target: "125-348-249-762-351", value: 2}
+  154: Object {source: "Synthesis and structure-activity relationships of …idines as potent inhibitors of TBK1/IKKε kinases.", target: "125-850-986-196-787", value: 2}
+  155: Object {source: "Peptide inhibitors of the Keap1-Nrf2 protein-protein interaction", target: "119-397-162-706-860", value: 2}
+  156: Object {source: "Small molecules that bind the Mdm2 RING stabilize and activate p53", target: "133-023-408-974-285", value: 2}
+  157: Object {source: "Small molecules that bind the Mdm2 RING stabilize and activate p53", target: "039-847-299-166-952", value: 2}
+  158: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "076-641-402-312-988", value: 2}
+  159: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "102-485-198-725-150", value: 2}
+  160: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "168-829-456-947-639", value: 2}
+  161: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "098-813-369-162-741", value: 2}
+  162: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "023-180-369-416-862", value: 2}
+  163: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "189-473-046-734-005", value: 2}
+  164: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "019-633-684-883-828", value: 2}
+  165: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "174-501-376-407-235", value: 2}
+  166: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "129-062-448-949-030", value: 2}
+  167: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "162-916-741-322-002", value: 2}
+  168: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "080-026-305-809-343", value: 2}
+  169: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "016-698-167-713-829", value: 2}
+  170: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "091-325-080-234-401", value: 2}
+  171: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "032-206-614-235-635", value: 2}
+  172: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "143-271-017-351-983", value: 2}
+  173: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "169-312-245-869-778", value: 2}
+  174: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "089-818-979-077-305", value: 2}
+  175: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "187-517-157-601-239", value: 2}
+  176: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "111-583-988-147-450", value: 2}
+  177: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "058-026-435-099-506", value: 2}
+  178: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "153-651-762-444-327", value: 2}
+  179: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "159-766-711-047-610", value: 2}
+  180: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "058-933-099-316-100", value: 2}
+  181: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "023-452-662-674-373", value: 2}
+  182: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "047-432-030-246-04X", value: 2}
+  183: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "139-008-712-602-518", value: 2}
+  184: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "137-720-748-139-162", value: 2}
+  185: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "192-136-893-476-749", value: 2}
+  186: Object {source: "Reduction in BACE1 decreases body weight, protects… obesity and enhances insulin sensitivity in mice", target: "172-890-893-515-719", value: 2}
+  187: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "104-472-615-006-481", value: 2}
+  188: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "097-374-332-908-898", value: 2}
+  189: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "034-416-075-094-770", value: 2}
+  190: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "127-642-274-375-054", value: 2}
+  191: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "036-708-909-192-156", value: 2}
+  192: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "193-863-590-855-263", value: 2}
+  193: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "150-028-859-997-047", value: 2}
+  194: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "034-416-075-094-770", value: 2}
+  195: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "097-374-332-908-898", value: 2}
+  196: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "104-472-615-006-481", value: 2}
+  197: Object {source: "AMP-Activated Protein Kinase: A Target for Drugs both Ancient and Modern", target: "132-394-716-226-832", value: 2}
+  198: Object {source: "Changes in the ratio of free NEDD8 to ubiquitin triggers NEDDylation by ubiquitin enzymes", target: "168-483-508-794-377", value: 2}
+  199: Object {source: "Fragment-based discovery of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors.", target: "131-238-819-455-784", value: 2}
+  200: Object {source: "Fragment-based discovery of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors.", target: "155-402-461-387-483", value: 2}
+  201: Object {source: "Fragment-based discovery of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors.", target: "040-389-070-176-191", value: 2}
+  202: Object {source: "Fragment-based discovery of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors.", target: "076-478-479-475-120", value: 2}
+  203: Object {source: "A multifunctional protease inhibitor to regulate endolysosomal function.", target: "031-461-589-086-771", value: 2}
+  204: Object {source: "A multifunctional protease inhibitor to regulate endolysosomal function.", target: "190-195-697-065-907", value: 2}
+  205: Object {source: "Design, Synthesis, and Structure−Activity Relation…ors of the Annexin A2−S100A10 Protein Interaction", target: "034-190-802-321-708", value: 2}
+  206: Object {source: "4-benzimidazolyl-3-phenylbutanoic acids as novel P…ing allosteric inhibitors of protein kinase PKCζ.", target: "130-316-719-983-242", value: 2}
+  207: Object {source: "Optimisation of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors", target: "076-478-479-475-120", value: 2}
+  208: Object {source: "Optimisation of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors", target: "040-389-070-176-191", value: 2}
+  209: Object {source: "Optimisation of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors", target: "036-668-261-470-040", value: 2}
+  210: Object {source: "Optimisation of 6-substituted isoquinolin-1-amine based ROCK-I inhibitors", target: "183-767-289-461-131", value: 2}
+  211: Object {source: "Design, Synthesis and Biological Evaluation of Nov…itors of Trypanosoma brucei Pteridine Reductase 1", target: "107-556-164-321-147", value: 2}
+  212: Object {source: "The inhibitory effect of phospholemman on the sodium pump requires its palmitoylation.", target: "106-594-488-484-12X", value: 2}
+  213: Object {source: "SCF/β-TrCP promotes glycogen synthase kinase 3-dep…ranscription factor in a keap1-independent manner", target: "066-190-726-252-149", value: 2}
+  214: Object {source: "Immunosuppressive but Non-LasR-Inducing Analogues …Molecule N-(3-Oxododecanoyl)-L-homoserine Lactone", target: "140-900-012-438-14X", value: 2}
+  215: Object {source: "Absolute SILAC-Compatible Expression Strain Allows…o-2 Copy Number Determination in Clinical Samples", target: "058-438-690-312-096", value: 2}
+  216: Object {source: "Absolute SILAC-Compatible Expression Strain Allows…o-2 Copy Number Determination in Clinical Samples", target: "004-889-112-130-518", value: 2}
+  217: Object {source: "Collateral sensitivity of multidrug-resistant cells to the orphan drug tiopronin.", target: "193-040-307-473-220", value: 2}
+  218: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "188-718-220-131-362", value: 2}
+  219: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "087-577-350-425-176", value: 2}
+  220: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "191-670-060-004-126", value: 2}
+  221: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "188-803-921-043-695", value: 2}
+  222: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "041-699-843-843-567", value: 2}
+  223: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "180-366-233-781-99X", value: 2}
+  224: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "156-653-831-632-101", value: 2}
+  225: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "051-324-518-696-462", value: 2}
+  226: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "161-487-188-181-03X", value: 2}
+  227: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "167-851-091-520-257", value: 2}
+  228: Object {source: "Characterization of a selective inhibitor of the Parkinson's disease kinase LRRK2", target: "122-739-962-072-793", value: 2}
+  229: Object {source: "ATP site-directed inhibitors of protein kinase CK2: an update.", target: "109-274-898-147-341", value: 2}
+  230: Object {source: "Identification of Inhibitors of the Leishmania cdc2-Related Protein Kinase CRK3", target: "124-179-501-005-870", value: 2}
+  231: Object {source: "Identification of Inhibitors of the Leishmania cdc2-Related Protein Kinase CRK3", target: "008-694-981-426-172", value: 2}
+  232: Object {source: "Identification of Inhibitors of the Leishmania cdc2-Related Protein Kinase CRK3", target: "109-611-546-954-080", value: 2}
+  233: Object {source: "Polyubiquitin binding to optineurin is required fo…-binding kinase 1 and production of interferon β.", target: "004-378-254-734-355", value: 2}
+  234: Object {source: "Polyubiquitin binding to optineurin is required fo…-binding kinase 1 and production of interferon β.", target: "133-997-520-845-569", value: 2}
+  235: Object {source: "Substrate and Product Analogues as Human O-Glcnac Transferase Inhibitors.", target: "115-381-943-359-61X", value: 2}
+  236: Object {source: "Substrate and Product Analogues as Human O-Glcnac Transferase Inhibitors.", target: "022-078-711-389-998", value: 2}
+  237: Object {source: "Substrate and Product Analogues as Human O-Glcnac Transferase Inhibitors.", target: "132-854-391-972-865", value: 2}
+  238: Object {source: "Substrate and Product Analogues as Human O-Glcnac Transferase Inhibitors.", target: "171-143-110-884-468", value: 2}
+  239: Object {source: "The cytoprotective role of the Keap1–Nrf2 pathway", target: "003-946-199-636-328", value: 2}
+  240: Object {source: "The cytoprotective role of the Keap1–Nrf2 pathway", target: "009-649-401-227-606", value: 2}
+  241: Object {source: "The cytoprotective role of the Keap1–Nrf2 pathway", target: "170-042-571-881-121", value: 2}
+  242: Object {source: "The cytoprotective role of the Keap1–Nrf2 pathway", target: "033-301-273-471-462", value: 2}
+  243: Object {source: "The cytoprotective role of the Keap1–Nrf2 pathway", target: "040-826-560-477-838", value: 2}
+  244: Object {source: "The cytoprotective role of the Keap1–Nrf2 pathway", target: "048-208-660-423-215", value: 2}
+  245: Object {source: "The cytoprotective role of the Keap1–Nrf2 pathway", target: "135-293-472-746-415", value: 2}
+  246: Object {source: "Design, synthesis and biological evaluation of 6-pyridylmethylaminopurines as CDK inhibitors", target: "153-999-081-812-523", value: 2}
+  247: Object {source: "Design, synthesis and biological evaluation of 6-pyridylmethylaminopurines as CDK inhibitors", target: "000-498-778-953-787", value: 2}
+  248: Object {source: "Design, synthesis and biological evaluation of 6-pyridylmethylaminopurines as CDK inhibitors", target: "085-065-777-135-758", value: 2}
+  249: Object {source: "Analgesic omega-Conotoxins CVIE and CVIF Selective…ve N-Type Calcium Channels (vol 77, pg 139, 2010)", target: "152-366-692-522-975", value: 2}
+  250: Object {source: "Analgesic omega-Conotoxins CVIE and CVIF Selective…ve N-Type Calcium Channels (vol 77, pg 139, 2010)", target: "167-869-142-610-582", value: 2}
+  251: Object {source: "NF-κB controls energy homeostasis and metabolic adaptation by upregulating mitochondrial respiration", target: "191-676-336-200-724", value: 2}
+  252: Object {source: "Development of 18F-fluorinatable dendrons and their application to cancer cell targeting", target: "056-387-403-639-935", value: 2}
+  253: Object {source: "The specificities of small molecule inhibitors of the TGFß and BMP pathways", target: "066-841-401-628-941", value: 2}
+  254: Object {source: "The specificities of small molecule inhibitors of the TGFß and BMP pathways", target: "069-503-782-573-055", value: 2}
+  255: Object {source: "The specificities of small molecule inhibitors of the TGFß and BMP pathways", target: "028-137-796-142-577", value: 2}
+  256: Object {source: "Catalysis by the nucleolytic ribozymes", target: "197-678-301-596-236", value: 2}
+  257: Object {source: "Catalysis by the nucleolytic ribozymes", target: "147-466-934-435-143", value: 2}
+  258: Object {source: "Catalysis by the nucleolytic ribozymes", target: "114-647-123-099-321", value: 2}
+  259: Object {source: "Catalysis by the nucleolytic ribozymes", target: "058-829-130-504-901", value: 2}
+  260: Object {source: "Catalysis by the nucleolytic ribozymes", target: "169-953-034-717-264", value: 2}
+  261: Object {source: "Characterization of GSK2334470, a novel and highly specific inhibitor of PDK1", target: "028-012-588-449-727", value: 2}
+  262: Object {source: "Characterization of GSK2334470, a novel and highly specific inhibitor of PDK1", target: "038-839-140-589-623", value: 2}
+  263: Object {source: "N1-Benzyl substituted cambinol analogues as isozym…ors of the sirtuin family of protein deacetylases", target: "194-924-906-201-593", value: 2}
+  264: Object {source: "N1-Benzyl substituted cambinol analogues as isozym…ors of the sirtuin family of protein deacetylases", target: "195-611-964-620-410", value: 2}
+  265: Object {source: "N1-Benzyl substituted cambinol analogues as isozym…ors of the sirtuin family of protein deacetylases", target: "025-014-524-538-421", value: 2}
+  266: Object {source: "N1-Benzyl substituted cambinol analogues as isozym…ors of the sirtuin family of protein deacetylases", target: "025-014-524-538-421", value: 2}
+  267: Object {source: "AMP-activated protein kinase—an energy sensor that regulates all aspects of cell function", target: "120-667-268-642-909", value: 2}
+  268: Object {source: "AMP-activated protein kinase—an energy sensor that regulates all aspects of cell function", target: "163-117-320-460-138", value: 2}
+  269: Object {source: "AMP-activated protein kinase—an energy sensor that regulates all aspects of cell function", target: "191-290-593-697-506", value: 2}
+  270: Object {source: "AMP-activated protein kinase—an energy sensor that regulates all aspects of cell function", target: "118-339-847-530-982", value: 2}
+  271: Object {source: "AMP-activated protein kinase—an energy sensor that regulates all aspects of cell function", target: "073-318-370-112-877", value: 2}
+  272: Object {source: "AMP-activated protein kinase—an energy sensor that regulates all aspects of cell function", target: "113-828-920-381-078", value: 2}
+  273: Object {source: "AMP-activated protein kinase—an energy sensor that regulates all aspects of cell function", target: "048-983-957-537-421", value: 2}
+  274: Object {source: "Optimisation of the Anti-Trypanosoma brucei Activity of the Opioid Agonist U50488", target: "073-531-962-083-670", value: 2}
+]
+}

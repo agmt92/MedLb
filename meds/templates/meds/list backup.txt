@@ -1,0 +1,94 @@
+{% extends "base_menu.html" %}
+{% block content %}
+
+<h1>Drug Search</h1>
+<div style="float:right">
+<form>
+  <input type="text" placeholder="Search.." name="search"
+  {% if search %} value="{{ search }}" {% endif %}>
+  <button type="submit"><i class="fa fa-search"></i></button>
+</form>
+</div>
+
+{% if drugs %}
+    <p><a class="nav-link" href="{% url 'ads:ad_create' %}">Leave us a comment</a></p>
+    <h2>Search Results:</h2>
+    <ul>
+    {% for drug in drugs %}
+    <p>
+        <li>
+            {{ drug.name.namnam }} {{ drug.dosage.dosnam }} {{ drug.form.formnam }}<br>
+            Active Ingredients:<a href="{% url 'meds:ing-detail' drug.ingredient.id %}">{{ drug.ingredient.ingnam }}</a><br>
+            <a href="{% url 'meds:atc-detail' drug.atc.id %}">Similar Drugs</a>
+            <p align="center">
+                Price:
+                <script>
+                    document.write(new Intl.NumberFormat().format({{ drug.price }}));
+                </script>
+                L.L.
+            </p>
+        {% if user.is_authenticated %}
+        <!-- Two hrefs with two stacked icons each - one showing and one hidden -->
+        <a href="#" onclick=
+            "favPost('{% url 'meds:med_unfavorite' drug.id %}', {{ drug.id }} );return false;"
+            {% if drug.id not in favorites %} style="display: none;" {% endif %}
+            id="favorite_star_{{drug.id}}">
+        <span class="fa-stack" style="vertical-align: middle;">
+        <i class="fa fa-star fa-stack-1x" style="color: orange;"></i>
+        <i class="fa fa-star-o fa-stack-1x"></i>
+        </span>
+        </a>
+        <!-- the second href -->
+        <a href="#" onclick=
+             "favPost('{% url 'meds:med_favorite' drug.id %}', {{ drug.id }} );return false;"
+            {% if drug.id in favorites %} style="display: none;" {% endif %}
+            id="unfavorite_star_{{drug.id}}">
+        <span class="fa-stack" style="vertical-align: middle;">
+        <i class="fa fa-star fa-stack-1x" style="display: none; color: orange;"></i>
+        <i class="fa fa-star-o fa-stack-1x"></i>
+        </span>
+        </a>
+        {% endif %}
+        </li>
+    </p>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p><a>No results found.</a></p>
+    <p><a class="nav-link" href="{% url 'ads:ad_create' %}">Leave us a comment</a></p>
+
+{% endif %}
+
+<script>
+function toggleInlineDisplay(star_id) {
+    var elem = document.getElementById(star_id);
+    if(window.getComputedStyle(elem).display == "inline") {
+        elem.style.display = 'none';
+        elem.dataset.previousDisplay = 'inline';
+    } else if(window.getComputedStyle(elem).display == "block") {
+        elem.style.display = 'none';
+        elem.dataset.previousDisplay = 'block';
+    } else {
+        console.log('prev', elem.dataset.previousDisplay);
+        if ( typeof elem.dataset.previousDisplay == 'string' ) {
+            elem.style.display = elem.dataset.previousDisplay
+        } else {
+            elem.style.display = 'inline';
+        }
+    }
+}
+
+function favPost(url, drug_id) {
+    console.log('POSTing to', url);
+    fetch(url, { method: 'POST', body: '{}' } )
+    .then((response) => {
+        console.log(url, 'finished');
+        toggleInlineDisplay("unfavorite_star_"+drug_id);
+        toggleInlineDisplay("favorite_star_"+drug_id);
+    }).catch((error) => {
+        alert('Url failed with '+error+' '+url);
+    });
+}
+</script>
+
+{% endblock %}

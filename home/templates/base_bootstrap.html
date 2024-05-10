@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PharmaLeb</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS (Updated to Bootstrap 5) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+    <!-- Sorting dropdown CSS for ingnam -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+
+   <!-- Include D3.js -->
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
+
+    <style>
+        body {
+    background-color: #f8f9fa;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100vh;
+    color: #212529;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.navbar-custom {
+    padding: 0.5rem 1rem;
+    background-color: #005792;
+    border-bottom: 3px solid #E8F1F2;
+}
+
+.navbar-custom .navbar-brand, .navbar-custom .nav-link, .navbar-custom .navbar-toggler-icon {
+    color: #E8F1F2;
+}
+
+.navbar-custom .nav-link:hover, .navbar-custom .navbar-brand:hover {
+    background-color: #E8F1F2;
+    color: #173753;
+    border-radius: 5px;
+}
+
+.dropdown-menu {
+    background-color: #007BFF;
+}
+
+.dropdown-item {
+    color: #E8F1F2 !important;
+}
+
+.dropdown-item:hover {
+    background-color: #173753;
+    color: #E8F1F2 !important;
+}
+
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% csrf_token %}
+    <div class="container mt-4">
+        {% block navbar %}{% endblock %}
+        {% block content %}{% endblock %}
+    </div>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

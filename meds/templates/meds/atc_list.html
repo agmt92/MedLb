@@ -1,0 +1,11 @@
+
+<!-- meds/atc_list.html -->
+{% csrf_token %}
+<h2>ATC Codes</h2>
+<ul>
+    {% for atc in atc_list %}
+        <li>
+            <a href="{% url 'meds:atc-detail' atc.id %}">{{ atc.atcnam }}</a>
+        </li>
+    {% endfor %}
+</ul>

@@ -1,0 +1,153 @@
+{% extends "base_menu.html" %}
+{% block content %}
+
+<div class="container mt-3">
+
+<h1>Pharmacy Search</h1>
+<div class="row">
+    <div class="col-md-12">
+<form method="get" action="." class="input-group mb-3">
+    <input type="hidden" name="field" id="searchField" value="{{ request.GET.field|default:'all' }}">
+    <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search for pharmacies..." aria-label="Search" aria-describedby="button-search">
+
+    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Search By</button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#" onclick="setSearchField('all')">All Fields</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setSearchField('phanam')">Pharmacy Name</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setSearchField('phacistnam')">Pharmacist Name</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setSearchField('addnam')">Address</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setSearchField('casnam')">Casa</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setSearchField('mounam')">Mouhafaza</a></li>
+        <!-- ... other fields as needed ... -->
+    </ul>
+
+    <button class="btn btn-outline-secondary" type="submit" id="button-search">Search</button>
+</form>
+
+    </div>
+</div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <form method="get" action="." class="d-flex justify-content-end">
+                <!-- Preserve the search query when sorting -->
+                <input type="hidden" name="q" value="{{ request.GET.q }}">
+
+                <!-- Button group for sorting dropdown -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort Results
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><button class="dropdown-item" type="submit" name="sort" value="relevance" {% if request.GET.sort == 'relevance' %}selected{% endif %}>Relevance</button></li>
+                        <li><button class="dropdown-item" type="submit" name="sort" value="alph_asc" {% if request.GET.sort == 'alph_asc' %}selected{% endif %}>Alphabetically (A-Z)</button></li>
+                        <li><button class="dropdown-item" type="submit" name="sort" value="alph_desc" {% if request.GET.sort == 'alph_desc' %}selected{% endif %}>Alphabetically (Z-A)</button></li>
+                        <!-- ... other sorting options ... -->
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% if page_obj %}
+    {% for pharmacy in page_obj %}
+    <div class="card">
+        <div class="card-body d-flex justify-content-between">
+         <div>
+            <h5 class="card-title">
+                <span id="pharmacy_name_{{ forloop.counter }}">{{ pharmacy.phanam }}</span>
+            </h5>
+            <p class="card-subtitle">{{ pharmacy.address.addnam }}, {{ pharmacy.address.casa.casnam }}, {{ pharmacy.address.casa.mouhafaza.mounam }}</p><br>
+            <p class="card-text">RPh. {{ pharmacy.phacistnam }}<br>
+            <a>Phone: {{ pharmacy.phones.phonam }}</a></p>
+                <!-- Buttons for all users -->
+                <a href="https://maps.google.com/?q=Pharmacy {{ pharmacy.phanam|urlencode }}, {{ pharmacy.address.addnam }}, Lebanon" class="btn btn-info btn-sm" target="_blank">View on Map</a>
+                <!-- Call Button -->
+                <a href="tel:+961{{ pharmacy.phones.phonam }}" class="btn btn-success btn-sm">Call</a>
+         </div>
+
+
+
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Pagination controls -->
+    <nav>
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}" aria-label="First">First</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Previous">Previous</a>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Next">Next</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}" aria-label="Last">Last</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+
+{% else %}
+    <p>No results found.</p>
+{% endif %}
+
+</div>
+
+<script>
+// Function to remove trailing numbers and stars from strings
+function removeTrailingNumbersAndStars(str) {
+    return str.replace(/[\s]*[\d*]+$/, '');
+}
+
+// Function to transform text to Title Case
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    }).replace(/([\.|\,|\-|\!|\?|\:])\s*(\w)/g, function(match, p1, p2) {
+        return p1 + " " + p2.toUpperCase();
+    });
+}
+
+// Set the search field when a dropdown item is clicked
+function setSearchField(field) {
+    document.getElementById('searchField').value = field;
+    // Update the dropdown button text (optional)
+    var dropdownButtonText = document.querySelector('.dropdown-toggle');
+    dropdownButtonText.textContent = field.charAt(0).toUpperCase() + field.slice(1); // Capitalize the first letter
+}
+
+// Wait for the DOM to load
+document.addEventListener('DOMContentLoaded', function() {
+    {% for pharmacy in page_obj %}
+        var pharmacyNameElement = document.getElementById("pharmacy_name_{{ forloop.counter }}");
+        var pharmacyName = pharmacyNameElement.textContent || pharmacyNameElement.innerText;
+
+        // Apply both functions to format the pharmacy name
+        pharmacyName = removeTrailingNumbersAndStars(pharmacyName);
+        pharmacyNameElement.textContent = toTitleCase(pharmacyName);
+
+        // ... Repeat the above process for other elements that require formatting ...
+    {% endfor %}
+});
+
+</script>
+
+
+{% endblock %}

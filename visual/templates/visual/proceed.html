@@ -1,0 +1,53 @@
+{% extends "base_menu.html" %}
+{% load static %}
+{% load humanize %} <!-- https://docs.djangoproject.com/en/4.2/ref/contrib/humanize -->
+
+<h2>Data Visualization Guide</h2>
+
+{% block content %}
+   <div class="container mt-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Welcome to Our Data Visualization Guide</h5>
+                <p class="card-text">This guide will help you understand how to interact with the visualization of our extensive drug database.<br>
+                For the best user experience, use your laptop as the database might be heavy for a mobile phone.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Step 1: Zooming In and Out</h5>
+                <p class="card-text">Use the scroll wheel on your mouse or the pinch gesture on a touchpad to zoom in and out of the visualization. This will help you get a closer look at the data or see the overall picture.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Step 2: Exploring Drug Connections</h5>
+                <p class="card-text">Hover your mouse over the orange circles to see the name of each drug. Lines connecting the circles represent drugs that are grouped together.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Step 3: Navigate and have Fun!</h5>
+                <p class="card-text">Press-hold on one of the dots and drag the groups around.<br>
+                Press-hold on the background to navigate without zooming in and out.</p>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Understanding the Scale</h5>
+                <p class="card-text">The visualization contains a comprehensive view of thousands of drugs in our database. The purpose is to showcase the vastness of the data we have collected.</p>
+            </div>
+        </div>
+
+
+        <div class="card-footer text-right">
+            <a href="/visual" class="btn btn-primary">Proceed to Visualization</a>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,54 @@
+body {
+  font-family: 'Roboto', Corbel, Avenir, 'Lucida Grande', 'Lucida Sans', sans-serif;
+  font-size: 1.25em;
+}
+
+div {
+    width:25%;
+    border: 5px solid;
+    padding: 5px;
+    margin: 5px;
+}
+
+a:-webkit-any-link {
+    color: #eeeeee;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+#link   {
+  text-align: center;
+  margin-left: 45%;
+  margin-right: 45%;
+  background-color: #0a4b33;
+  color: #eeeeee;
+}
+
+#one {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  border-color: yellow;
+}
+
+#two {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  border-color: blue;
+}
+
+#three {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border-color: green;
+}
+
+#four {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  border-color: red;
+}
+

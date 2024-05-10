@@ -1,0 +1,11 @@
+
+<!-- meds/ing_list.html -->
+{% csrf_token %}
+<h2>ING Codes</h2>
+<ul>
+    {% for ing in ing_list %}
+        <li>
+            <a href="{% url 'meds:ing-detail' ing.id %}">{{ ing.ingnam }}</a>
+        </li>
+    {% endfor %}
+</ul>
